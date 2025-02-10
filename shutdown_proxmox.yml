@@ -1,0 +1,32 @@
+---
+- name: Shutdown all Proxmox VMs and the Proxmox host
+  hosts: proxmox_host  # The group of hosts in your Ansible inventory that represents your Proxmox host.
+  become: yes  # Ensure we have root (administrator) access for shutdown tasks
+  
+  tasks:
+    - name: Gather a list of all VMs on the Proxmox host
+      proxmox_kvm:
+        api_user: "root@pam"  # Replace with your Proxmox admin user
+        api_password: "1Wizard!"  # Replace with your Proxmox admin password
+        api_host: "192.168.50.55"  # Replace with your Proxmox host IP or hostname
+        validate_certs: false  # Set to 'true' if you want to validate SSL certs
+        state: list
+      register: vms
+
+    - name: Shutdown all running VMs
+      proxmox_kvm:
+        api_user: "root@pam"
+        api_password: "1Wizard!"
+        api_host: "192.168.50.55"
+        validate_certs: false
+        vmid: "{{ item.vmid }}"
+        state: stopped
+      loop: "{{ vms.resources }}"
+      when: vms.resources is defined
+      notify:
+        - Shutdown Proxmox host
+
+  handlers:
+    - name: Shutdown Proxmox host
+      command: shutdown -h now  # Gracefully shut down the Proxmox host
+      become: yes  # Ensure we have root (administrator) access to shut down the host
