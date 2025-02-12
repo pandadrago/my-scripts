@@ -14,10 +14,14 @@
         shell: "qm shutdown {{ item }}"
         loop: "{{ vm_list.stdout_lines }}"
         when: vm_list.stdout != ''
+      
+      - name: Count number of VMs in vm_list
+        set_fact:
+          vm_count: "{{ vm_list | length }}"
   
       - name: Wait for VMs to shut down
         pause:
-          minutes: 3
+          minutes: "{{ vm_count }}"
         when: vm_list.stdout != '[]'
   
       - name: Shut down the Proxmox host
