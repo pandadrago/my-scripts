@@ -5,29 +5,42 @@
     gather_facts: no
   
     tasks:
+      # Gets good list of VM ids
       - name: Get the list of VMs on the Proxmox host
         shell: "qm list | awk '{print $1}' | tail -n +2"
         register: vm_list
         changed_when: false
-  
+
+      #  Shutdown all the VMs
       - name: Gracefully shut down all VMs
         shell: "qm shutdown {{ item }}"
         loop: "{{ vm_list.stdout_lines }}"
+        async: 600
+        poll: 0
         when: vm_list.stdout != ''
-      
-      - name: Count number of VMs in vm_list
-        set_fact:
-          vm_count: "{{ vm_list | length }}"
-  
-      - name: Wait for VMs to shut down
-        pause:
-          minutes: "{{ vm_count }}"
-        when: vm_list.stdout != '[]'
-  
+
+      # Checks status of each VM. retries loop when the grep command returns 1. 
+      - name: Wait for all VMs to stop (check every 5 seconds)
+        shell: "qm status {{ item }} | grep -q 'status: stopped'"
+        loop: "{{ vm_list.stdout_lines }}"
+        register: vm_shutdownstatus
+        until:  vm_shutdownstatus.rc != 1
+        retries: 60
+        delay: 5
+
       - name: Shut down the Proxmox host
         command: "shutdown -h now"
         async: 1  # Run the command asynchronously
         poll: 0  # Don't wait for the task to finish (allow Ansible to finish before host shuts down)
         when: vm_list.stdout != '[]'
+        ignore_errors: yes
+      
+      - name: Wait for Proxmox host to become unreachable
+        wait_for:
+          host: "{{ inventory_hostname }}"
+          state: stopped
+          timeout: 600  # Timeout of 10 minutes for Proxmox shutdown
+          delay: 5      # Check every 5 seconds
+        when: vm_list.stdout != ''
         ignore_errors: yes
   

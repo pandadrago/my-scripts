@@ -13,6 +13,7 @@
    - Implement backup solutions (like Veeam, Bacula) to ensure VM recovery in case of failures.
    - Promox backup solution
    - Probably going to get another server for this specifically
+   - maybe veaam?
 
 4. **Version Control Server (GitLab, Gitea, etc.)**
    - Set up a Git repository service for version control and collaboration (GitLab or Gitea).
