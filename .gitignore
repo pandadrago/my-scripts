@@ -1,4 +1,5 @@
-vars.yml
-secrets.yml
-inventory.ini
+**/vars.yml
+**/secrets.yml
+**/inventory.ini
 Notes.md
+**/.env
