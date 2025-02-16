@@ -4,7 +4,7 @@
 echo "Shutting down all running VMs..."
 for vmid in $(qm list | awk '{if(NR>1)print $1}'); do
     echo "Shutting down VM $vmid..."
-    qm shutdown $vmid
+    qm shutdown "$vmid"
 done
 
 # Wait for all VMs to shut down gracefully (optional: adjust timeout as needed)
