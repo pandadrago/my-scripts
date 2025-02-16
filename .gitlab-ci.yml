@@ -1,8 +1,5 @@
-stages:
-  - lint
-
-shellcheck:
-  stage: lint
-  image: koalaman/shellcheck:stable
-  script:
-    - shellcheck shutdownPve.sh # Lint the shutdownPve.sh script
+test:
+    image: koalaman/shellcheck-alpine:latest
+    stage: test
+    script: 
+    - shellcheck shutdownPve.sh
