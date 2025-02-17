@@ -1,5 +1,18 @@
-test:
-    image: koalaman/shellcheck-alpine:latest
-    stage: test
-    script: 
-    - shellcheck shutdownPve.sh
+stages:
+  - lint
+
+# Lint shell scripts with ShellCheck
+lint_shell_scripts:
+  stage: lint
+  image: koalaman/shellcheck:stable
+  script:
+    - echo "Linting all shell scripts..."
+    - find . -name "*.sh" -exec shellcheck {} \;
+
+# Lint YAML files with yamllint
+lint_yaml_files:
+  stage: lint
+  image: cytopia/yamllint
+  script:
+    - echo "Linting all YAML files..."
+    - find . -name "*.yml" -exec yamllint {} \;
