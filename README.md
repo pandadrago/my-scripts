@@ -20,10 +20,6 @@ git branch -M main
 git push -uf origin main
 ```
 
-## Integrate with your tools
-
-- [ ] [Set up project integrations](https://192.168.50.199/root/my-scripts/-/settings/integrations)
-
 ## Collaborate with your team
 
 - [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
